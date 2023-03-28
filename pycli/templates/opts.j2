@@ -1,0 +1,8 @@
+{% if cmd.opts %}
+Options:
+{%- filter indent(width=2) %}
+{% for opt in cmd.opts -%}
+{% for f in opt.flags %}{{ f }} {% endfor %}{{ "%40s" | format(opt.help) }}
+{%- endfor %}
+{%- endfilter %}
+{%- endif %}

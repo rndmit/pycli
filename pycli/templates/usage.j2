@@ -1,0 +1,4 @@
+Usage:
+{%- filter indent(width=4) %}
+{{ cmd.name }} {% if cmd.opts | length %}\[options]{% endif %} {% if cmd.children | length %}\[command]{% endif %}
+{% endfilter -%}

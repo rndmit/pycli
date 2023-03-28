@@ -1,0 +1,8 @@
+{% if cmd.children | length %}
+Commands:
+{%- filter indent(width=4) %}
+{%- for subcmd in cmd.children %}
+{{ subcmd.name }}{{ "%40s" | format(subcmd.short) }}
+{%- endfor %}
+{%- endfilter %}
+{%- endif %}

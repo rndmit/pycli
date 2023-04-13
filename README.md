@@ -56,6 +56,6 @@ app.with_commands(Foo()).run()
 
 ## TODO
 
-[ ] Unit-tests
-[ ] Usage documentation
-[ ] WIP-features
+- [ ] Unit-tests
+- [ ] Usage documentation
+- [ ] WIP-features

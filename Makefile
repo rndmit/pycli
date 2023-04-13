@@ -4,7 +4,7 @@ docs: ## Generate doc from docstirngs
 
 .PHONY: lint
 lint:
-	pylint pycli/
+	flake8 pycli/
 
 .PHONY: unit-test
 unit-testing: ## Run unit testing

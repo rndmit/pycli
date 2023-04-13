@@ -1,13 +1,15 @@
 # PyCLI
 
-Python CLI applications with classes and typing
-
 ### Status: work in progress
 #### This software is not ready for production usage. Use it at your own risk
 
 
 
-> Click is good but you need to compose commands with a lot of decorators. Fire is good for fast prototyping but its full of magic underhood. So I decided to try to write a new CLI framework. Its inspired by [spf13/cobra](https://github.com/spf13/cobra) and written with an emphasis on code clarity and using as little magic as possible.
+> Click is good but you need to compose commands with a lot of decorators. Fire is good for fast prototyping but its full of magic underhood. So I decided to try to write a new CLI framework. 
+
+PyCLI is a library for creating CLI Applications. It's inspired by [spf13/cobra](https://github.com/spf13/cobra) and written with an emphasis on strictly typing, extensibility and as less magic as possible.
+
+You define your application as child classes of the Command class. After you just instantiate Application class and register your commands in it. After firing Application.run method PyCLI parses sys.argv list, determines entered commands and extract values for their options.
 
 ## TL;DR
 

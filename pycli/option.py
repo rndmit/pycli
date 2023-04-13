@@ -7,18 +7,22 @@ T = TypeVar("T")
 
 
 class IncompatibleTypingErr(Exception):
+    """Raised when Option's type conflicts with attributes"""
     pass
 
 
 class MissingRequiredOptionErr(Exception):
+    """Raised when option marked as required but not presented in input"""
     pass
 
 
 class UnableToParseErr(Exception):
+    """Raised when input cannot be casted to Option's type"""
     pass
 
 
 class NotEnoughOptValuesErr(Exception):
+    """Raised when input has more or less option values than required"""
     pass
 
 
@@ -39,10 +43,20 @@ class Option(Generic[T]):
         flags: list[str] = None,
         help: str = "",
         default: T = None,
-        nargs: str | int = 1,
+        nargs: int = 1,
         is_flag: bool = False,
         required: bool = False,
     ):
+        """
+        Args:
+            name: option name
+            flags: list of option's flags
+            help: help string for option
+            default: default value for option
+            nargs: number of expected args
+            is_flag: indicates if option is flag (don't accept any values)
+            required: indicates if option is required
+        """
         self.name = name
         if flags is None:
             self.flags = [f"--{self.name}"]
@@ -65,6 +79,8 @@ class Option(Generic[T]):
         return self.name == other.name
 
     def process(self, inputl: list[str]) -> Tuple[Optional[T], list[str]]:
+        """Search Option's flag in inputl
+        """
         ret_t = get_type_args(self.__orig_class__)[0]
         if self.is_flag and not (ret_t == bool):
             raise IncompatibleTypingErr("flag option couldn't be other type than bool")
@@ -86,14 +102,21 @@ class Option(Generic[T]):
             return self.default, inputl
 
     def extract_value(self, idx: int, inputl: list[str]) -> Tuple[T, list[str]]:
-        def remove(l: list, idx: int):
-            return l[:idx] + l[idx+1 :]
+        """Extract option value(-s) after given index
+
+        Arguments:
+            idx: index of Option's flag
+            inputl: list of input
+        """
+        def remove(l: list, idx: int, count=0):
+            del l[idx:idx+count+1]
+            return l
 
         ret_t = get_type_args(self.__orig_class__)[0]
         if self.is_flag:
             return True, remove(inputl, idx)
         if self.nargs == 1:
-            return ret_t(inputl[idx + 1]), remove(inputl, idx)
+            return ret_t(inputl[idx + 1]), remove(inputl, idx, 1)
         # TODO: Add support for +/?
         if type(self.nargs) == str:
             raise Exception("Not implemented yet")
@@ -111,11 +134,11 @@ class Option(Generic[T]):
             except:
                 raise UnableToParseErr(f"unable to convert {val} to {result_t}")
             result.append(r)
-        del inputl[idx:idx + self.nargs + 1]
-        return result, inputl
+        return result, remove(inputl, idx, self.nargs)
 
-    @staticmethod
-    def extract_boolean(val) -> bool:
+    def extract_boolean(val: bool|str) -> bool:
+        """Extract bool value
+        """
         if isinstance(val, bool):
             return val
         if isinstance(val, str):

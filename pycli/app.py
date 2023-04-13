@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Self
 import sys
 import jinja2
 from .command import Command
@@ -38,7 +38,7 @@ class Application(object):
         self.__messager = Messager(jinja2.FileSystemLoader("pycli/templates"))
         self.root_cmd = self.RootCommand(name, descr)
 
-    def register(self, *cmds: Command):
+    def with_commands(self, *cmds: Command) -> Self:
         """Registers Command within application's root command
 
         Args:
@@ -46,6 +46,7 @@ class Application(object):
         """
         for cmd in cmds:
             self.root_cmd.children.append(cmd)
+        return self
 
     def run(self) -> int:
         """Runs Application lifecycle
@@ -64,12 +65,13 @@ class Application(object):
             if r[1] is not None:
                 inputlf = r[1]
             if r is not None:
-                resolved_opts[i.name] = r[0]
+                resolved_opts[i.name] = r[0] 
+        cpath = [self.root_cmd.name, *ret[2]]
         if len(inputlf) != 0:
-            self.__messager.show_error(ret[0], f"unrecognized command or option: {inputlf}")
+            self.__messager.show_error(ret[0], cpath, f"unrecognized command or option: {inputlf}")
             return 1
         if resolved_opts['help']:
-            self.__messager.show_help(ret[0])
+            self.__messager.show_help(ret[0], cpath)
             return 0
         rc = ret[0].exec(resolved_opts)
         return rc

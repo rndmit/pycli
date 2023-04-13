@@ -1,3 +1,5 @@
+"""App module
+"""
 from typing import Tuple, Self
 import sys
 import jinja2
@@ -28,7 +30,7 @@ class Application(object):
     __messager: Messager
     root_cmd: Command
 
-    def __init__(self, name: str, descr: str = None, global_opts: Tuple[Option] = None):
+    def __init__(self, name: str = "", descr: str = None, global_opts: Tuple[Option] = None):
         """
         Args:
             name: application name (actually root command name)
@@ -37,6 +39,8 @@ class Application(object):
         """
         self.__messager = Messager(jinja2.FileSystemLoader("pycli/templates"))
         self.root_cmd = self.RootCommand(name, descr)
+        if global_opts:
+            self.root_cmd.opts += global_opts
 
     def with_commands(self, *cmds: Command) -> Self:
         """Registers Command within application's root command

@@ -1,3 +1,5 @@
+"""Option module
+"""
 from typing import ClassVar, Self, Generic, TypeVar, Type, Optional, Tuple, cast
 from typing import get_args as get_type_args
 from collections.abc import Iterable

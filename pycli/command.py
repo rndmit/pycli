@@ -1,3 +1,5 @@
+"""Command module
+"""
 from abc import ABC, abstractmethod
 from typing import ClassVar, Self, Tuple, Optional
 from .option import Option
@@ -37,12 +39,13 @@ class Command(ABC):
         if not hasattr(cls, "long"):
             cls.long = ""
 
-    """Finds if subcommand with given name exists
 
-    Arguments:
-        name: name of subcommand
-    """
     def find_child(self, name: str) -> Optional[Self]:
+        """Finds if subcommand with given name exists
+
+        Arguments:
+            name: name of subcommand
+        """
         if not hasattr(self, "children"):
             return None
         for child in self.children:
@@ -50,14 +53,15 @@ class Command(ABC):
                 return child
         return None
 
-    """Process inputl recursively above this command and it's subcommands
 
-    Arguments:
-        inputl: tuple of inputed strings
-        collected_opts: set of Options which already found from Commands
-        cmd_path: list of Commands before this
-    """
     def process(self, inputl: Tuple[str], collected_opts: set[Option], cmd_path: list[str] = []) -> Tuple[Self, set[Option], Tuple[str]]:
+        """Process inputl recursively above this command and it's subcommands
+
+        Arguments:
+            inputl: tuple of inputed strings
+            collected_opts: set of Options which already found from Commands
+            cmd_path: list of Commands before this
+        """
         if hasattr(self, "opts") and self.opts:
             collected_opts.update(self.opts)
         if len(inputl) == 0:

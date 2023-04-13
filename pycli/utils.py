@@ -1,3 +1,5 @@
+"""Utils module
+"""
 from abc import abstractmethod
 
 def abstractproperty(f):

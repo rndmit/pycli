@@ -8,11 +8,8 @@ on:
     paths:
       - Dockerfile
 
-env:
-  IMAGE_NAME: rndmit/pycli/dev-image
-
 jobs:
-  echo:
+  build-dev-image:
     runs-on: ubuntu-latest
     steps:
       # -
@@ -34,4 +31,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: $IMAGE_NAME:latest
+          tags: ${{ vars.DEV_IMAGE_NAME }}:latest

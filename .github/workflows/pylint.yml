@@ -1,0 +1,13 @@
+name: Pylint
+
+on: [push]
+
+jobs:
+  lint_sources:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Running YAMLlint
+      uses: "docker://pipelinecomponents/pylint:latest"
+      with:
+        args: make lint

@@ -9,7 +9,7 @@
 
 PyCLI is a library for creating CLI Applications. It's inspired by [spf13/cobra](https://github.com/spf13/cobra) and written with an emphasis on strictly typing, extensibility and as less magic as possible.
 
-You define your application as child classes of the Command class. After you just instantiate Application class and register your commands in it. After firing Application.run method PyCLI parses sys.argv list, determines entered commands and extract values for their options.
+Define your application as child classes of the Command class. Instantiate Application class and register your commands in it. After firing Application.run method PyCLI parses argv list, determines entered commands and extract values for their options.
 
 ## TL;DR
 

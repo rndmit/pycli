@@ -44,7 +44,7 @@ class Foo(pycli.Command):
         print("foo")
         return 0
 
-app.with_commands(Foo()).run()
+pycli.Application().with_commands(Foo()).run()
 ```
 
 ## Features

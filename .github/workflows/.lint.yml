@@ -13,6 +13,6 @@ jobs:
       uses: actions/checkout@v3
     - 
       name: Running YAMLlint
-      uses: "docker://pipelinecomponents/pylint:latest"
+      uses: "docker://${{ vars.DEV_IMAGE_NAME }}:latest"
       with:
-        args: pylint pycli/
+        args: flake8 pycli/

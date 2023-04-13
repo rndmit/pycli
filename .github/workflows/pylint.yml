@@ -1,0 +1,13 @@
+name: Pylint
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: hub.docker.io/alpine:latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Running YAMLlint
+      uses: "docker://pipelinecomponents/yamllint:latest"
+      with:
+        args: yamllint .

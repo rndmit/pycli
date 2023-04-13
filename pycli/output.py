@@ -11,12 +11,12 @@ class Messager(object):
         self.console = Console()
         self.template_engine = jinja2.Environment(loader=templates)
 
-    def show_help(self, cmd: Command):
+    def show_help(self, cmd: Command, cpath: list[str]):
         self.console.print(
-            self.template_engine.get_template("help.j2").render(cmd=cmd)
+            self.template_engine.get_template("help.j2").render(cmd=cmd, cpath=cpath)
         )
 
-    def show_error(self, cmd: Command, errmsg: str):
+    def show_error(self, cmd: Command, cpath: list[str], errmsg: str):
         self.console.print(
-            self.template_engine.get_template("error.j2").render(cmd=cmd, errmsg=errmsg)
+            self.template_engine.get_template("error.j2").render(cmd=cmd, errmsg=errmsg, cpath=cpath)
         )

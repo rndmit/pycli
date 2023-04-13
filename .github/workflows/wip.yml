@@ -13,4 +13,4 @@ on:
 
 jobs:
   pylint:
-    uses: ./.github/workflows/stages/.pylint.yml
+    uses: ./.github/workflows/.pylint.yml

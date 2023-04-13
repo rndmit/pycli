@@ -1,0 +1,16 @@
+on:
+  push:
+    branches:
+      - wip
+  pull_request:
+    types: 
+      - opened 
+      - reopened
+    branches:
+      - wip
+    paths:
+      - pycli/
+
+jobs:
+  pylint:
+    uses: ./.github/workflows/stages/lint.yml

@@ -1,13 +1,16 @@
-name: Pylint
+name: pylint
 
-on: [push]
+on:
+  workflow_call:
+    inputs: {}
+    secrets: {}
 
 jobs:
-  lint_sources:
-    runs-on: ubuntu-latest
+  pylint:
+    runs-on: alpine-latest
     steps:
     - uses: actions/checkout@v3
     - name: Running YAMLlint
       uses: "docker://pipelinecomponents/pylint:latest"
       with:
-        args: make lint
+        args: pylint pycli/

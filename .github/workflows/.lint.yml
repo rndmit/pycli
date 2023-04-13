@@ -16,6 +16,6 @@ jobs:
       uses: actions/checkout@v3
     - 
       name: Running YAMLlint
-      uses: "docker://${{ inputs.dev_image_name }}:latest"
+      uses: "docker://${{ github.event.inputs.dev_image_name }}:latest"
       with:
         args: flake8 pycli/

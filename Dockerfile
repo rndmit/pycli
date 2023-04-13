@@ -1,5 +1,7 @@
 FROM docker.io/library/python:3.11-alpine
 
+LABEL org.opencontainers.image.source https://github.com/rndmit/pycli
+
 WORKDIR /opt/pycli
 
 ENV POETRY_VERSION=1.4.2 \

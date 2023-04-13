@@ -14,3 +14,5 @@ on:
 jobs:
   pylint:
     uses: ./.github/workflows/.lint.yml
+    with:
+      dev_image_name: ${{ vars.DEV_IMAGE_NAME }}

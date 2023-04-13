@@ -2,7 +2,10 @@ name: lint
 
 on:
   workflow_call:
-    inputs: {}
+    inputs: 
+      dev_image_name:
+        required: true
+        type: string
     secrets: {}
 
 jobs:
@@ -13,6 +16,6 @@ jobs:
       uses: actions/checkout@v3
     - 
       name: Running YAMLlint
-      uses: "docker://${{ vars.DEV_IMAGE_NAME }}:latest"
+      uses: "docker://${{ inputs.dev_image_name }}:latest"
       with:
         args: flake8 pycli/

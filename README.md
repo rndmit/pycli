@@ -60,4 +60,5 @@ pycli.Application().with_commands(Foo()).run()
 
 - [ ] Unit-tests
 - [ ] Usage documentation
+- [ ] Flagless arguments
 - [ ] WIP-features

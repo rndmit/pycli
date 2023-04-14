@@ -3,7 +3,7 @@ name: lint
 on:
   workflow_call:
     inputs: 
-      dev-image-name:
+      dev_image_name:
         required: true
         type: string
     secrets: {}
@@ -12,7 +12,7 @@ jobs:
   flake8:
     runs-on: ubuntu-latest
     container:
-      image: ${{ inputs.dev-image-name }}:latest
+      image: ${{ inputs.dev_image_name }}:latest
     steps:
     - 
       uses: actions/checkout@v3

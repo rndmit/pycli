@@ -60,7 +60,7 @@ class Option(Generic[T]):
             flags: list of option's flags
             help: help string for option
             default: default value for option
-            nargs: number of expected args
+            nargs: number of expected args or "+" (one or more)
             is_flag: indicates if option is flag (don't accept any values)
             required: indicates if option is required
         """

@@ -3,7 +3,7 @@ name: lint
 on:
   workflow_call:
     inputs: 
-      dev_image_name:
+      dev-image-name:
         required: true
         type: string
     secrets: {}
@@ -11,11 +11,11 @@ on:
 jobs:
   flake8:
     runs-on: ubuntu-latest
+    container:
+      image: ${{ inputs.dev-image-name }}:latest
     steps:
     - 
       uses: actions/checkout@v3
     - 
       name: Running YAMLlint
-      uses: docker://${{ inputs.dev_image_name }}:latest
-      with:
-        args: flake8 pycli/
+      run: flake8 pycli/

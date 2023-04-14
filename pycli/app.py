@@ -13,10 +13,17 @@ class Application(object):
     root command of your CLI app. It handles all CLI application \
     lifecycle.
     """
+
     class RootCommand(Command):
         opts = [
-            Option[bool]("help", flags=["-h", "--help"], help="Get help for commands", is_flag=True)
+            Option[bool](
+                "help",
+                flags=["-h", "--help"],
+                help="Get help for commands",
+                is_flag=True,
+            )
         ]
+
         def __init__(self, name, descr=None, *opts: Option):
             self.name = name
             self.long = descr
@@ -30,7 +37,9 @@ class Application(object):
     __messager: Messager
     root_cmd: Command
 
-    def __init__(self, name: str = "", descr: str = None, global_opts: Tuple[Option] = None):
+    def __init__(
+        self, name: str = "", descr: str = None, global_opts: Tuple[Option] = None
+    ):
         """
         Args:
             name: application name (actually root command name)
@@ -59,23 +68,37 @@ class Application(object):
             Numeric result code
         """
         inputl = sys.argv[1:]
-        ret = self.root_cmd.process(inputl, set())
+        cmd, opts, cmdpath = self.root_cmd.process(inputl, set())
         resolved_opts = {}
-        inputlf = [x for x in inputl if x not in ret[2]]
-        for i in ret[1]:
-            r = i.process(inputlf)
-            if r is None:
-                continue
-            if r[1] is not None:
-                inputlf = r[1]
-            if r is not None:
-                resolved_opts[i.name] = r[0] 
-        cpath = [self.root_cmd.name, *ret[2]]
-        if len(inputlf) != 0:
-            self.__messager.show_error(ret[0], cpath, f"unrecognized command or option: {inputlf}")
+        args = [x for x in inputl if x not in cmdpath]
+        resolved_opts, args = self.__resolve_opts(list(opts), args)
+        cpath = [self.root_cmd.name, *cmdpath]
+        if len(args) != 0:
+            self.__messager.show_error(
+                cmd, cpath, f"unrecognized command or option: {args}"
+            )
             return 1
-        if resolved_opts['help']:
-            self.__messager.show_help(ret[0], cpath)
+        if resolved_opts["help"]:
+            self.__messager.show_help(cmd, cpath)
             return 0
-        rc = ret[0].exec(resolved_opts)
+        rc = cmd.exec(resolved_opts)
         return rc
+
+    def __resolve_opts(
+        self, opts: list[Option], args: list[str]
+    ) -> Tuple[dict[Option], dict[str]]:
+        resolved_opts = {}
+        retargs = []
+        opts.sort(
+            # nargs "+" goes first
+            key=lambda x: (x.nargs == "+", isinstance(x.nargs, int)), reverse=True
+        )
+        for opt in opts:
+            result, retargs = opt.process(args)
+            if result is None:
+                continue
+            if retargs is None:
+                break
+            args = retargs
+            resolved_opts[opt.name] = result
+        return resolved_opts, retargs

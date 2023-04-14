@@ -3,39 +3,44 @@
 from typing import ClassVar, Self, Generic, TypeVar, Type, Optional, Tuple, cast
 from typing import get_args as get_type_args
 from collections.abc import Iterable
-
-
-T = TypeVar("T")
+import re
 
 
 class IncompatibleTypingErr(Exception):
     """Raised when Option's type conflicts with attributes"""
+
     pass
 
 
 class MissingRequiredOptionErr(Exception):
     """Raised when option marked as required but not presented in input"""
+
     pass
 
 
 class UnableToParseErr(Exception):
     """Raised when input cannot be casted to Option's type"""
+
     pass
 
 
 class NotEnoughOptValuesErr(Exception):
     """Raised when input has more or less option values than required"""
+
     pass
 
 
+T = TypeVar("T")
+
+
 class Option(Generic[T]):
-    """Option represents an Option for your Command
-    """
+    """Option represents an Option for your Command"""
+
     name: ClassVar[str]
     flags: ClassVar[list[str]]
     help: ClassVar[str]
     default: ClassVar[T]
-    nargs: ClassVar[str | int]
+    nargs: ClassVar[int | str]
     is_flag: ClassVar[bool]
     required: ClassVar[bool]
 
@@ -45,7 +50,7 @@ class Option(Generic[T]):
         flags: list[str] = None,
         help: str = "",
         default: T = None,
-        nargs: int = 1,
+        nargs: int | str = 1,
         is_flag: bool = False,
         required: bool = False,
     ):
@@ -81,14 +86,17 @@ class Option(Generic[T]):
         return self.name == other.name
 
     def process(self, inputl: list[str]) -> Tuple[Optional[T], list[str]]:
-        """Search Option's flag in inputl
-        """
+        """Search Option's flag in inputl"""
         ret_t = get_type_args(self.__orig_class__)[0]
         if self.is_flag and not (ret_t == bool):
             raise IncompatibleTypingErr("flag option couldn't be other type than bool")
-        if self.nargs > 1 and not isinstance(ret_t, Iterable):
+        if isinstance(self.nargs, int) and self.nargs > 1 and not isinstance(ret_t, Iterable):
             raise IncompatibleTypingErr(
-                "option takes more than 1 arg but it's type not iterable"
+                f"option {self.name} has {self.nargs} nargs property but it's type not iterable"
+            )
+        if isinstance(self.nargs, str) and self.nargs == "+" and not isinstance(ret_t, Iterable):
+            raise IncompatibleTypingErr(
+                f"option {self.name} has {self.nargs} nargs property but it's type not iterable"
             )
         for flag in self.flags:
             try:
@@ -102,6 +110,7 @@ class Option(Generic[T]):
             return False, inputl
         if self.default:
             return self.default, inputl
+        return None, inputl
 
     def extract_value(self, idx: int, inputl: list[str]) -> Tuple[T, list[str]]:
         """Extract option value(-s) after given index
@@ -110,8 +119,9 @@ class Option(Generic[T]):
             idx: index of Option's flag
             inputl: list of input
         """
+
         def remove(l: list, idx: int, count=0):
-            del l[idx:idx+count+1]
+            del l[idx : idx + count + 1]
             return l
 
         ret_t = get_type_args(self.__orig_class__)[0]
@@ -119,11 +129,15 @@ class Option(Generic[T]):
             return True, remove(inputl, idx)
         if self.nargs == 1:
             return ret_t(inputl[idx + 1]), remove(inputl, idx, 1)
-        # TODO: Add support for +/?
-        if type(self.nargs) == str:
-            raise Exception("Not implemented yet")
+        valoffset = self.nargs
+        if isinstance(self.nargs, str) and self.nargs == "+":
+            valoffset = 0
+            for pos in inputl[idx + 1:]:
+                if re.match(r"-.*", pos):
+                    break
+                valoffset += 1 
         result, result_t = ret_t(), ret_t.__args__[0]
-        for pos in range(idx + 1, idx + self.nargs + 1):
+        for pos in range(idx + 1, idx + valoffset + 1):
             try:
                 val = inputl[pos]
             except IndexError:
@@ -136,18 +150,16 @@ class Option(Generic[T]):
             except:
                 raise UnableToParseErr(f"unable to convert {val} to {result_t}")
             result.append(r)
-        return result, remove(inputl, idx, self.nargs)
+        return result, remove(inputl, idx, valoffset)
 
-    def extract_boolean(val: bool|str) -> bool:
-        """Extract bool value
-        """
+    def extract_boolean(val: bool | str) -> bool:
+        """Extract bool value"""
         if isinstance(val, bool):
             return val
         if isinstance(val, str):
             val = val.lower()
             if val == "true" or val == "yes":
                 return True
-            elif val == "false" or val =="no":
+            elif val == "false" or val == "no":
                 return False
         raise Exception(f"unable to convert {val} to bool")
-        

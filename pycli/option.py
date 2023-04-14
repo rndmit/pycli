@@ -53,6 +53,7 @@ class Option(Generic[T]):
         nargs: int | str = 1,
         is_flag: bool = False,
         required: bool = False,
+        local: bool = False
     ):
         """
         Args:
@@ -75,7 +76,10 @@ class Option(Generic[T]):
         self.is_flag = is_flag
         if self.is_flag:
             self.nargs = 0
+        elif self.nargs == 0:
+            self.is_flag = True
         self.required = required
+        self.local = local
 
     def __hash__(self):
         return hash((self.name))
@@ -131,6 +135,7 @@ class Option(Generic[T]):
             return ret_t(inputl[idx + 1]), remove(inputl, idx, 1)
         valoffset = self.nargs
         if isinstance(self.nargs, str) and self.nargs == "+":
+            # Search last posible value if nargs == +
             valoffset = 0
             for pos in inputl[idx + 1:]:
                 if re.match(r"-.*", pos):

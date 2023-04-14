@@ -5,6 +5,7 @@ import sys
 import jinja2
 from .command import Command
 from .option import Option
+from .values import Values
 from .output import Messager
 
 
@@ -14,16 +15,14 @@ class Application(object):
     lifecycle.
     """
 
-    class RootCommand(Command):
-        opts = [
-            Option[bool](
-                "help",
-                flags=["-h", "--help"],
-                help="Get help for commands",
-                is_flag=True,
-            )
-        ]
+    opt_help = Option[bool](
+        "help",
+        flags=["-h", "--help"],
+        help="Get help for commands",
+        is_flag=True,
+    )
 
+    class RootCommand(Command):
         def __init__(self, name, descr=None, *opts: Option):
             self.name = name
             self.long = descr
@@ -47,7 +46,7 @@ class Application(object):
             global_opts: Options which will be parsed with all commands
         """
         self.__messager = Messager(jinja2.FileSystemLoader("pycli/templates"))
-        self.root_cmd = self.RootCommand(name, descr)
+        self.root_cmd = self.RootCommand(name, descr, self.opt_help)
         if global_opts:
             self.root_cmd.opts += global_opts
 
@@ -69,36 +68,16 @@ class Application(object):
         """
         inputl = sys.argv[1:]
         cmd, opts, cmdpath = self.root_cmd.process(inputl, set())
-        resolved_opts = {}
         args = [x for x in inputl if x not in cmdpath]
-        resolved_opts, args = self.__resolve_opts(list(opts), args)
+        values, args = Values.from_opts_args(list(opts), args)
         cpath = [self.root_cmd.name, *cmdpath]
         if len(args) != 0:
             self.__messager.show_error(
                 cmd, cpath, f"unrecognized command or option: {args}"
             )
             return 1
-        if resolved_opts["help"]:
+        if values.get(self.opt_help):
             self.__messager.show_help(cmd, cpath)
             return 0
-        rc = cmd.exec(resolved_opts)
+        rc = cmd.exec(values)
         return rc
-
-    def __resolve_opts(
-        self, opts: list[Option], args: list[str]
-    ) -> Tuple[dict[Option], dict[str]]:
-        resolved_opts = {}
-        retargs = []
-        opts.sort(
-            # nargs "+" goes first
-            key=lambda x: (x.nargs == "+", isinstance(x.nargs, int)), reverse=True
-        )
-        for opt in opts:
-            result, retargs = opt.process(args)
-            if result is None:
-                continue
-            if retargs is None:
-                break
-            args = retargs
-            resolved_opts[opt.name] = result
-        return resolved_opts, retargs

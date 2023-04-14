@@ -30,16 +30,16 @@ Example command:
 class Foo(pycli.Command):
     short = "Prints 'foo'"
     long = "Prints 'foo' to stdout"
-    opts = [
-        pycli.Option[bool](
+    
+    _opt_verbose = pycli.Option[bool]( # local option
             "verbose", 
             ["-v", "--verbose"], 
             "Print more information", 
             is_flag=True)
-    ]
 
-    def exec(self, opts: dict) -> int:
-        if opts["verbose"]:
+    def exec(self, vals: pycli.Values) -> int:
+        verbose = vals.get(self._opt_verbose)
+        if verbose: # verbose is bool because option's type is
             print("Printing 'foo'")
         print("foo")
         return 0

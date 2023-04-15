@@ -39,7 +39,7 @@ Registers Command within application's root command
 #### run
 
 ```python
-def run() -> int
+def run(argv: list[str] = None) -> int
 ```
 
 Runs Application lifecycle

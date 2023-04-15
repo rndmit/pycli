@@ -2,6 +2,8 @@ on:
   push:
     branches:
       - wip
+    paths:
+      - pycli/
   pull_request:
     types: 
       - opened 

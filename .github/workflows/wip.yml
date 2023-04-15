@@ -17,6 +17,6 @@ jobs:
     with:
       dev_image_name: ${{ vars.DEV_IMAGE_NAME }}
   test:
-    uses: ./.github/workflows/.lint.yml
+    uses: ./.github/workflows/.test.yml
     with:
       dev_image_name: ${{ vars.DEV_IMAGE_NAME }}

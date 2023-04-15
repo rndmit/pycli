@@ -31,8 +31,8 @@ class Application(object):
             for opt in opts:
                 self.opts.append(opt)
 
-        def exec(self, opts):
-            return
+        def exec(self, vals):
+            return 0
 
     __messager: Messager
     root_cmd: Command
@@ -62,15 +62,17 @@ class Application(object):
             self.root_cmd.children.append(cmd)
         return self
 
-    def run(self) -> int:
+    def run(self, argv: list[str] = None) -> int:
         """Runs Application lifecycle
 
         Returns:
             Numeric result code
         """
-        inputl = sys.argv[1:]
-        cmd, opts, cmdpath = self.root_cmd.process(inputl, set())
-        args = [x for x in inputl if x not in cmdpath]
+        if argv is None:
+            argv = sys.argv[1:]
+        cmd, opts, cmdpath = self.root_cmd.process(argv, set())
+        args = [x for x in argv if x not in cmdpath]
+
         values, args = Values.from_opts_args(list(opts), args)
         cpath = [self.root_cmd.name, *cmdpath]
         if len(args) != 0:

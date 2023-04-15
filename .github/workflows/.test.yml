@@ -9,7 +9,7 @@ on:
     secrets: {}
 
 jobs:
-  flake8:
+  pytest:
     runs-on: ubuntu-latest
     container:
       image: ${{ inputs.dev_image_name }}:latest
@@ -17,6 +17,5 @@ jobs:
     - 
       uses: actions/checkout@v3
     - 
-      name: Running flake8
-
-      run: make lint
+      name: Running pytest
+      run: make unit-test

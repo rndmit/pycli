@@ -23,6 +23,7 @@ class Application(object):
     )
 
     class RootCommand(Command):
+
         def __init__(self, name, descr=None, *opts: Option):
             self.name = name
             self.long = descr
@@ -36,13 +37,14 @@ class Application(object):
     __messager: Messager
     root_cmd: Command
 
-    def __init__(
-        self, name: str = "", descr: str = None, global_opts: Tuple[Option] = None
-    ):
+    def __init__(self,
+                 name: str = "",
+                 descr: str = None,
+                 global_opts: Tuple[Option] = None):
         """
         Args:
             name: application name (actually root command name)
-            descr: discription of your application (e.g. "tool for doing something"
+            descr: discription of your application
             global_opts: Options which will be parsed with all commands
         """
         self.__messager = Messager(jinja2.FileSystemLoader("pycli/templates"))
@@ -73,8 +75,7 @@ class Application(object):
         cpath = [self.root_cmd.name, *cmdpath]
         if len(args) != 0:
             self.__messager.show_error(
-                cmd, cpath, f"unrecognized command or option: {args}"
-            )
+                cmd, cpath, f"unrecognized command or option: {args}")
             return 1
         if values.get(self.opt_help):
             self.__messager.show_help(cmd, cpath)

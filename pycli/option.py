@@ -1,6 +1,6 @@
 """Option module
 """
-from typing import ClassVar, Self, Generic, TypeVar, Type, Optional, Tuple, cast
+from typing import ClassVar, Generic, TypeVar, Optional, Tuple
 from typing import get_args as get_type_args
 from collections.abc import Iterable
 import re
@@ -44,17 +44,15 @@ class Option(Generic[T]):
     is_flag: ClassVar[bool]
     required: ClassVar[bool]
 
-    def __init__(
-        self,
-        name: str,
-        flags: list[str] = None,
-        help: str = "",
-        default: T = None,
-        nargs: int | str = 1,
-        is_flag: bool = False,
-        required: bool = False,
-        local: bool = False
-    ):
+    def __init__(self,
+                 name: str,
+                 flags: list[str] = None,
+                 help: str = "",
+                 default: T = None,
+                 nargs: int | str = 1,
+                 is_flag: bool = False,
+                 required: bool = False,
+                 local: bool = False):
         """
         Args:
             name: option name
@@ -93,15 +91,17 @@ class Option(Generic[T]):
         """Search Option's flag in inputl"""
         ret_t = get_type_args(self.__orig_class__)[0]
         if self.is_flag and not (ret_t == bool):
-            raise IncompatibleTypingErr("flag option couldn't be other type than bool")
-        if isinstance(self.nargs, int) and self.nargs > 1 and not isinstance(ret_t, Iterable):
             raise IncompatibleTypingErr(
-                f"option {self.name} has {self.nargs} nargs property but it's type not iterable"
-            )
-        if isinstance(self.nargs, str) and self.nargs == "+" and not isinstance(ret_t, Iterable):
-            raise IncompatibleTypingErr(
-                f"option {self.name} has {self.nargs} nargs property but it's type not iterable"
-            )
+                "flag option couldn't be other type than bool")
+        if isinstance(self.nargs, int) and self.nargs > 1 and not isinstance(
+                ret_t, Iterable):
+            raise IncompatibleTypingErr(f"option {self.name} has {self.nargs}\
+                    nargs property but it's type not iterable")
+        if isinstance(
+                self.nargs,
+                str) and self.nargs == "+" and not isinstance(ret_t, Iterable):
+            raise IncompatibleTypingErr(f"option {self.name} has {self.nargs}\
+                      nargs property but it's type not iterable")
         for flag in self.flags:
             try:
                 pos = inputl.index(flag)
@@ -116,7 +116,8 @@ class Option(Generic[T]):
             return self.default, inputl
         return None, inputl
 
-    def extract_value(self, idx: int, inputl: list[str]) -> Tuple[T, list[str]]:
+    def extract_value(self, idx: int,
+                      inputl: list[str]) -> Tuple[T, list[str]]:
         """Extract option value(-s) after given index
 
         Arguments:
@@ -124,9 +125,9 @@ class Option(Generic[T]):
             inputl: list of input
         """
 
-        def remove(l: list, idx: int, count=0):
-            del l[idx : idx + count + 1]
-            return l
+        def remove(src: list, idx: int, count=0):
+            del src[idx:idx + count + 1]
+            return src
 
         ret_t = get_type_args(self.__orig_class__)[0]
         if self.is_flag:
@@ -140,7 +141,7 @@ class Option(Generic[T]):
             for pos in inputl[idx + 1:]:
                 if re.match(r"-.*", pos):
                     break
-                valoffset += 1 
+                valoffset += 1
         result, result_t = ret_t(), ret_t.__args__[0]
         for pos in range(idx + 1, idx + valoffset + 1):
             try:
@@ -152,8 +153,9 @@ class Option(Generic[T]):
                 continue
             try:
                 r = result_t(val)
-            except:
-                raise UnableToParseErr(f"unable to convert {val} to {result_t}")
+            except Exception:
+                raise UnableToParseErr(
+                    f"unable to convert {val} to {result_t}")
             result.append(r)
         return result, remove(inputl, idx, valoffset)
 

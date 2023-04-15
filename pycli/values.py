@@ -1,7 +1,6 @@
 """Values module
 """
-from typing import ClassVar, Self, Generic, TypeVar, Type, Optional, Tuple, cast
-from typing import get_args as get_type_args
+from typing import Self, TypeVar, Tuple
 from .option import Option
 
 
@@ -29,8 +28,9 @@ class Values(object):
         try:
             return self.__values[opt]
         except KeyError:
-            raise OptionNotExistsErr(f"option {opt.name} doesnt exist in this command context")
-        
+            raise OptionNotExistsErr(
+                f"option {opt.name} doesnt exist in this command context")
+
     def get_by_name(self, name: str, strict: bool = False) -> any:
         for opt, val in self.__values.items():
             if opt.name != name:
@@ -44,8 +44,8 @@ class Values(object):
         retargs = []
         opts = list(self.__values.keys())
         opts.sort(
-            # nargs "+" goes first
-            key=lambda x: (x.is_flag, x.nargs == "+", isinstance(x.nargs, int)),
+            key=lambda x:
+            (x.is_flag, x.nargs == "+", isinstance(x.nargs, int)),
             reverse=True,
         )
         for opt in opts:
@@ -59,7 +59,8 @@ class Values(object):
         return retargs
 
     @staticmethod
-    def from_opts_args(opts: dict[str, any], args: list[str]) -> Tuple[Self, list[str]]:
+    def from_opts_args(opts: dict[str, any],
+                       args: list[str]) -> Tuple[Self, list[str]]:
         v = Values(opts)
         retargs = v.resolve_opts(args)
         return v, retargs

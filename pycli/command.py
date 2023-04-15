@@ -47,7 +47,8 @@ class Command(ABC):
         ]
         for dopt in defined_opts:
             if dopt in cls.opts:
-                raise Exception(f"opt {dopt.name} defined both in class and opts list")
+                raise Exception(
+                    f"opt {dopt.name} defined both in class and opts list")
             dopt.local = True
             cls.opts.append(dopt)
 
@@ -65,8 +66,10 @@ class Command(ABC):
         return None
 
     def process(
-        self, inputl: Tuple[str], collected_opts: set[Option], cmd_path: list[str] = []
-    ) -> Tuple[Self, set[Option], Tuple[str]]:
+            self,
+            inputl: Tuple[str],
+            collected_opts: set[Option],
+            cmd_path: list[str] = []) -> Tuple[Self, set[Option], Tuple[str]]:
         """Process inputl recursively above this command and it's subcommands
 
         Arguments:

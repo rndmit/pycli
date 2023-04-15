@@ -4,6 +4,7 @@ on:
       - wip
     paths:
       - pycli/
+
   pull_request:
     types: 
       - opened 

@@ -39,8 +39,9 @@ Registers Command within application's root command
 #### run
 
 ```python
+
 def run(argv: list[str] = None) -> int
-```
+
 
 Runs Application lifecycle
 

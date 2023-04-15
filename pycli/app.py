@@ -72,6 +72,7 @@ class Application(object):
             argv = sys.argv[1:]
         cmd, opts, cmdpath = self.root_cmd.process(argv, set())
         args = [x for x in argv if x not in cmdpath]
+
         values, args = Values.from_opts_args(list(opts), args)
         cpath = [self.root_cmd.name, *cmdpath]
         if len(args) != 0:

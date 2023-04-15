@@ -1,8 +1,11 @@
+"""App module
+"""
 from typing import Tuple, Self
 import sys
 import jinja2
 from .command import Command
 from .option import Option
+from .values import Values
 from .output import Messager
 
 
@@ -11,10 +14,16 @@ class Application(object):
     root command of your CLI app. It handles all CLI application \
     lifecycle.
     """
+
+    opt_help = Option[bool](
+        "help",
+        flags=["-h", "--help"],
+        help="Get help for commands",
+        is_flag=True,
+    )
+
     class RootCommand(Command):
-        opts = [
-            Option[bool]("help", flags=["-h", "--help"], help="Get help for commands", is_flag=True)
-        ]
+
         def __init__(self, name, descr=None, *opts: Option):
             self.name = name
             self.long = descr
@@ -28,15 +37,20 @@ class Application(object):
     __messager: Messager
     root_cmd: Command
 
-    def __init__(self, name: str, descr: str = None, global_opts: Tuple[Option] = None):
+    def __init__(self,
+                 name: str = "",
+                 descr: str = None,
+                 global_opts: Tuple[Option] = None):
         """
         Args:
             name: application name (actually root command name)
-            descr: discription of your application (e.g. "tool for doing something"
+            descr: discription of your application
             global_opts: Options which will be parsed with all commands
         """
         self.__messager = Messager(jinja2.FileSystemLoader("pycli/templates"))
-        self.root_cmd = self.RootCommand(name, descr)
+        self.root_cmd = self.RootCommand(name, descr, self.opt_help)
+        if global_opts:
+            self.root_cmd.opts += global_opts
 
     def with_commands(self, *cmds: Command) -> Self:
         """Registers Command within application's root command
@@ -55,23 +69,16 @@ class Application(object):
             Numeric result code
         """
         inputl = sys.argv[1:]
-        ret = self.root_cmd.process(inputl, set())
-        resolved_opts = {}
-        inputlf = [x for x in inputl if x not in ret[2]]
-        for i in ret[1]:
-            r = i.process(inputlf)
-            if r is None:
-                continue
-            if r[1] is not None:
-                inputlf = r[1]
-            if r is not None:
-                resolved_opts[i.name] = r[0] 
-        cpath = [self.root_cmd.name, *ret[2]]
-        if len(inputlf) != 0:
-            self.__messager.show_error(ret[0], cpath, f"unrecognized command or option: {inputlf}")
+        cmd, opts, cmdpath = self.root_cmd.process(inputl, set())
+        args = [x for x in inputl if x not in cmdpath]
+        values, args = Values.from_opts_args(list(opts), args)
+        cpath = [self.root_cmd.name, *cmdpath]
+        if len(args) != 0:
+            self.__messager.show_error(
+                cmd, cpath, f"unrecognized command or option: {args}")
             return 1
-        if resolved_opts['help']:
-            self.__messager.show_help(ret[0], cpath)
+        if values.get(self.opt_help):
+            self.__messager.show_help(cmd, cpath)
             return 0
-        rc = ret[0].exec(resolved_opts)
+        rc = cmd.exec(values)
         return rc

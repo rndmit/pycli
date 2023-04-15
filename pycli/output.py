@@ -1,3 +1,5 @@
+"""Output module
+"""
 from rich.console import Console
 import jinja2
 from .command import Command
@@ -13,10 +15,11 @@ class Messager(object):
 
     def show_help(self, cmd: Command, cpath: list[str]):
         self.console.print(
-            self.template_engine.get_template("help.j2").render(cmd=cmd, cpath=cpath)
-        )
+            self.template_engine.get_template("help.j2").render(cmd=cmd,
+                                                                cpath=cpath))
 
     def show_error(self, cmd: Command, cpath: list[str], errmsg: str):
         self.console.print(
-            self.template_engine.get_template("error.j2").render(cmd=cmd, errmsg=errmsg, cpath=cpath)
-        )
+            self.template_engine.get_template("error.j2").render(cmd=cmd,
+                                                                 errmsg=errmsg,
+                                                                 cpath=cpath))

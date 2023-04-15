@@ -1,0 +1,21 @@
+name: lint
+
+on:
+  workflow_call:
+    inputs: 
+      dev_image_name:
+        required: true
+        type: string
+    secrets: {}
+
+jobs:
+  flake8:
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ inputs.dev_image_name }}:latest
+    steps:
+    - 
+      uses: actions/checkout@v3
+    - 
+      name: Running flake8
+      run: flake8 pycli/

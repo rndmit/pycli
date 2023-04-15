@@ -1,45 +1,51 @@
 import pycli
 
-EXTTEXT_OPT = pycli.Option[str]("extra", help="Add extra text", default="")
+EXTTEXT_OPT = pycli.Option[list[str]]("extra", help="Add extra text", default="", nargs="+")
 
 
 class Bar(pycli.Command):
     short = "Prints 'bar'"
     long = "Prints 'bar' to stdout"
+
     opts = [
-        pycli.Option[bool](
-            "verbose", ["-v", "--verbose"], "Print more information", is_flag=True
-        ),
-        pycli.Option[int]("rc", help="Return code"),
+        # defining predefined option
+        # it's value will be available from get method
         EXTTEXT_OPT,
+        # defining name-referenced opt
+        # it's value will be available from get_by_name method
+        pycli.Option[int]("rc", help="Return code"),
     ]
 
-    def exec(self, opts: dict) -> int:
-        if opts["verbose"]:
-            print("Printing 'bar'")
-        try:
-            extra = opts["extra"]
-        except:
-            extra = ""
-        print(f"bar {extra}")
-        try:
-            return opts["rc"]
-        except:
-            return 0
+    def exec(self, vals: pycli.Values) -> int:
+        
+        extra = vals.get(EXTTEXT_OPT)
+        if extra is None:
+            extra = []
+        print(f"bar {' '.join(extra)}")
+        
+        rc = vals.get_by_name("rc", True)
+        if rc:
+            return rc
+        return 0
 
 
 class Foo(pycli.Command):
     short = "Prints 'foo'"
     long = "Prints 'foo' to stdout"
-    opts = [
-        pycli.Option[bool](
+
+   # All attributes named like _opt_* are interpreted like local options
+    _opt_verbose = pycli.Option[bool](
             "verbose", ["-v", "--verbose"], "Print more information", is_flag=True
         )
+    opts = [
+        EXTTEXT_OPT
     ]
+
     children = [Bar()]
 
-    def exec(self, opts: dict) -> int:
-        if opts["verbose"]:
+    def exec(self, vals: pycli.Values) -> int:
+        verbose = vals.get(self._opt_verbose)
+        if verbose:
             print("Printing 'foo'")
         print("foo")
         return 0

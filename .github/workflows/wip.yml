@@ -1,0 +1,18 @@
+on:
+  push:
+    branches:
+      - wip
+  pull_request:
+    types: 
+      - opened 
+      - reopened
+    branches:
+      - wip
+    paths:
+      - pycli/
+
+jobs:
+  pylint:
+    uses: ./.github/workflows/.lint.yml
+    with:
+      dev_image_name: ${{ vars.DEV_IMAGE_NAME }}

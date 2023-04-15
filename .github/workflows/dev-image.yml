@@ -7,6 +7,8 @@ on:
       - master
     paths:
       - Dockerfile
+      - pyproject.toml
+      - poetry.lock
 
 jobs:
   build-dev-image:

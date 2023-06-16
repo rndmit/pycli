@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pycli"
-version = "0.0.0-ea1"
+version = "0.0.0"
 description = ""
 authors = ["rndmit <rndmit@icloud.com>"]
 readme = "README.md"

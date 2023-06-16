@@ -9,9 +9,9 @@ class Messager(object):
     console: Console
     template_engine: jinja2.Environment
 
-    def __init__(self, templates: jinja2.BaseLoader) -> None:
+    def __init__(self) -> None:
         self.console = Console()
-        self.template_engine = jinja2.Environment(loader=templates)
+        self.template_engine = jinja2.Environment(loader=jinja2.PackageLoader("pycli", "templates"))
 
     def show_help(self, cmd: Command, cpath: list[str]):
         self.console.print(

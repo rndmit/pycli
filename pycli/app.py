@@ -47,7 +47,7 @@ class Application(object):
             descr: discription of your application
             global_opts: Options which will be parsed with all commands
         """
-        self.__messager = Messager(jinja2.FileSystemLoader("pycli/templates"))
+        self.__messager = Messager()
         self.root_cmd = self.RootCommand(name, descr, self.opt_help)
         if global_opts:
             self.root_cmd.opts += global_opts
